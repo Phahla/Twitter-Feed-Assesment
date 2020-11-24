@@ -27,10 +27,9 @@ class Main{
         }
     }
 
-    public static void checkIfFilesExist(String usersFile,String tweetsFile){
+    public static void checkIfFilesExist(File userFileDir,File tweetsFileDir){
         try {
-            File userFileDir = new File(usersFile);
-            File tweetsFileDir = new File(tweetsFile);
+
             if(!userFileDir.exists()){
                 throw new Exception("The input user file does not exist. Please provide a valid file name.");
             }else if(!tweetsFileDir.exists()){
@@ -38,7 +37,8 @@ class Main{
             }
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
-            System.exit(0);        }
+            System.exit(0);        
+        }
     }
     
     public static void main(String[] args) {
@@ -47,7 +47,13 @@ class Main{
 
         inputFileTypeChecker(args[0], args[1]);
 
-        checkIfFilesExist(args[0], args[1]);
+        File userFileDir = new File(args[0]);
+        File tweetsFileDir = new File(args[1]);
+        checkIfFilesExist(userFileDir,tweetsFileDir);
+
+        Users users = new Users(userFileDir);
+        Tweets tweets = new Tweets(tweetsFileDir);
+        Display display = new Display(users, tweets);
 
     }
 }
