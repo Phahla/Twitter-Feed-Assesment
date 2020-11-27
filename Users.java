@@ -9,6 +9,7 @@ public class Users {
     private ArrayList<ArrayList<String>> twitterUsers = new ArrayList<ArrayList<String>>();
 
     Users(){}
+
     Users(File fileName){
         try {
             scannedFile = new Scanner(fileName);            
@@ -24,58 +25,64 @@ public class Users {
         return twitterUsers;
     }
 
+    private int indexOfuser(String userName){
+        for(int i = 0; i < twitterUsers.size();i++){
+            if(twitterUsers.get(i).get(0).equals(userName)){
+                return i;   
+            }
+        }
+        return -1;
+    }
+
+    private void addNewUserAndFollowers(String userName, ArrayList<String> twitterUser, String [] following){
+        twitterUsers.add(twitterUser);
+        twitterUser.add(userName);
+        for(int i = 0; i < following.length; i++){
+            twitterUsers.get(twitterUsers.size()-1).add(following[i]);
+        }
+    }
+
+    private void appendUser(ArrayList<String> twitterUser, String [] following){
+        for(int i = 0; i < following.length; i++){
+            if(!twitterUser.contains(following[i])){
+                twitterUser.add(following[i]);
+            }    
+        } 
+    }
+
     private void readFromFile(){
-  
         try {
                     
-        int lineNumber = 0;
-        int userCount = 0;
-        while (scannedFile.hasNextLine()){
+            int lineNumber = 0;
             
+            while (scannedFile.hasNextLine()){
+            
+                String nextLine = scannedFile.nextLine();
+                errorHandling.checkIfFollowsExists(nextLine, lineNumber);
 
-            String nextLine = scannedFile.nextLine();
-            errorHandling.checkIfFollowsExists(nextLine, lineNumber);
+                String userName = nextLine.substring(0, nextLine.indexOf("follows")).replaceAll("\\s+","");
+                errorHandling.checkIfUserExists(userName, lineNumber);
 
-            String userName = nextLine.substring(0, nextLine.indexOf("follows")).replaceAll("\\s+","");
-            errorHandling.checkIfUserExists(userName, lineNumber);
+                int existingLineNumber = indexOfuser(userName);
 
-            boolean exists = false;
-            int existingLineNumber = 0;
+                String listOfPeopleFollowing = nextLine.substring(nextLine.indexOf("follows")+7,nextLine.length()).replaceAll("\\s+","");
+                errorHandling.checkIfUserIsFollowingAnyone(listOfPeopleFollowing, lineNumber);
 
-            for(int i = 0; i < twitterUsers.size();i++){
-                if(twitterUsers.get(i).get(0).equals(userName)){
-                    exists=true;
-                    existingLineNumber = i;
-                        
-                    break;
-                }
+                String [] following = listOfPeopleFollowing.split(",");
                 
-            }
-
-            String listOfPeopleFollowing = nextLine.substring(nextLine.indexOf("follows")+7,nextLine.length()).replaceAll("\\s+","");
-            errorHandling.checkIfUserIsFollowingAnyone(listOfPeopleFollowing, lineNumber);
-
-            String [] following = listOfPeopleFollowing.split(",");
-            
-            if(!exists){
-                twitterUsers.add(new ArrayList<String>());
-                twitterUsers.get(userCount).add(userName.replaceAll("\\s+",""));
-                for(int i = 0; i < following.length; i++){
-                    twitterUsers.get(userCount).add(following[i].replaceAll("\\s+",""));
+                ArrayList<String> twitterUser = existingLineNumber == -1 ? new ArrayList<String> () : twitterUsers.get(existingLineNumber); 
+                
+                if(existingLineNumber == -1){
+                    addNewUserAndFollowers(userName, twitterUser, following);
+                }else{
+                    appendUser(twitterUser, following);
                 }
-                userCount++;
-            }else{
-                for(int i = 0; i < following.length; i++){
-                    if(!twitterUsers.get(existingLineNumber).contains(following[i])){
-                        twitterUsers.get(existingLineNumber).add(following[i].replaceAll("\\s+",""));
-                    }    
-                }            
-            }
-            lineNumber++;
-        } 
+                lineNumber++;
+            } 
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            System.exit(0);        }   
+            System.exit(0);        
+        }   
     }
     
 }

@@ -16,7 +16,6 @@ public class Tweets {
             e.printStackTrace();
             System.exit(0);
         }
-        
         readFromFile();
     }  
 
