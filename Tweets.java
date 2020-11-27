@@ -4,7 +4,10 @@ import java.util.*;
 public class Tweets {
     
     private Scanner scannedFile;
+    ErrorHandling errorHandling = new ErrorHandling();
     private ArrayList<ArrayList<String>> tweets = new ArrayList<ArrayList<String>>();
+
+    Tweets(){}
 
     Tweets(File fileName){
         try {
@@ -24,67 +27,29 @@ public class Tweets {
     private void readFromFile(){
         int lineNumber = 0;
 
-        while (scannedFile.hasNextLine()){
-            tweets.add(new ArrayList<String>());
-
-            String nextLine = scannedFile.nextLine();
-            checkForGreaterSign(nextLine, lineNumber);
-
-            String userName = nextLine.substring(0, nextLine.indexOf(">")).replaceAll("\\s+","");
-            checkIfUserExists(userName, lineNumber);
-
-            tweets.get(lineNumber).add(userName.replaceAll("\\s+",""));
-            String tweet = nextLine.substring(nextLine.indexOf(">")+1,nextLine.length());
-            checkIfTweetExists(tweet, lineNumber);
-
-            checkTweetLength(tweet, lineNumber);
-
-            tweets.get(lineNumber).add(tweet);
-            lineNumber++;
-        }
-    }
-
-    private void checkForGreaterSign(String nextLine, int lineNumber){
         try {
-            if(nextLine.indexOf(">") == -1 ){
-                throw new Exception("The format of the content on line: "+ lineNumber +" is incorrect.");
+            while (scannedFile.hasNextLine()){
+                tweets.add(new ArrayList<String>());
+    
+                String nextLine = scannedFile.nextLine();
+                errorHandling.checkForGreaterSign(nextLine, lineNumber);
+    
+                String userName = nextLine.substring(0, nextLine.indexOf(">")).replaceAll("\\s+","");
+                errorHandling.checkIfUserExists(userName, lineNumber);
+    
+                tweets.get(lineNumber).add(userName.replaceAll("\\s+",""));
+                String tweet = nextLine.substring(nextLine.indexOf(">")+1,nextLine.length());
+                errorHandling.checkIfTweetExists(tweet, lineNumber);
+    
+                errorHandling.checkTweetLength(tweet, lineNumber);
+    
+                tweets.get(lineNumber).add(tweet);
+                lineNumber++;
             }
         } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
-            System.exit(0);
-        }
+            System.out.println(e.getMessage());
+            System.exit(0);        }
     }
 
-    private void checkIfUserExists(String nextLine, int lineNumber){
-        try {
-            if(nextLine.equals("")){
-                throw new Exception("There exists a tweet with no user on line: "+ lineNumber +".");
-            }
-        } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
-            System.exit(0);
-        }
-    }
 
-    private void checkIfTweetExists(String nextLine, int lineNumber){
-        try {
-            if(nextLine.replaceAll("\\s+","").equals("") ){
-                throw new Exception("The user on line: "+ lineNumber +" has not tweeted anything.");
-            }
-        } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
-            System.exit(0);
-        }
-    }
-
-    private void checkTweetLength(String nextLine, int lineNumber){
-        try {
-            if(nextLine.replaceAll("\\s+","").length() > 280){
-                throw new Exception("The tweet on line: "+ lineNumber +" has more than 280 characters.");
-            }
-        } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
-            System.exit(0);
-        }
-    }
 }

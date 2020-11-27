@@ -1,9 +1,9 @@
 all.o:
 	javac -cp .:hamcrest-core-2.2.jar:junit-4.12.jar *.java
 main.o:
-	javac Tweets.java Users.java Main.java
+	javac Display.java ErrorHandling.java ValidationCodes.java Tweets.java Users.java Main.java
 tests.o:
-	javac -cp .:hamcrest-core-2.2.jar:junit-4.12.jar Tweets.java Users.java Main.java
+	javac -cp .:hamcrest-core-2.2.jar:junit-4.12.jar Display.java ErrorHandling.java ValidationCodes.java Tweets.java Users.java Main.java TwitterTester.java TestRunner.java
 run:
 	make all.o; java Main
 runTests:
